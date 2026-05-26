@@ -10,12 +10,7 @@ export function Hero() {
 
       <div className="mx-auto max-w-6xl px-4 pb-20 pt-16 sm:px-6 sm:pt-24">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-soft">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            +2034 D4 cette année · ⭐ 4.9/5 sur 400+ avis
-          </span>
-
-          <h1 className="mt-6 text-balance text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
+          <h1 className="text-balance text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
             Teste un dossier EDN{" "}
             <span className="bg-gradient-to-r from-brand-600 to-emerald-500 bg-clip-text text-transparent">
               gratuitement

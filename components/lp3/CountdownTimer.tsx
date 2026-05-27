@@ -2,10 +2,25 @@
 
 import { useEffect, useState } from "react";
 
-function getMidnightTarget() {
-  const d = new Date();
-  d.setHours(24, 0, 0, 0);
-  return d.getTime();
+const TOTAL_SPOTS = 50;
+const SECONDS_PER_SPOT = 47;
+
+function getInitialState() {
+  const now = new Date();
+  const startOfDay = new Date(now);
+  startOfDay.setHours(8, 0, 0, 0);
+  const elapsedSec = Math.max(
+    0,
+    Math.floor((now.getTime() - startOfDay.getTime()) / 1000)
+  );
+  const taken = Math.min(
+    TOTAL_SPOTS - 3,
+    Math.floor(elapsedSec / SECONDS_PER_SPOT)
+  );
+  const remaining = Math.max(3, TOTAL_SPOTS - taken);
+  const into = elapsedSec % SECONDS_PER_SPOT;
+  const nextIn = Math.max(1, SECONDS_PER_SPOT - into);
+  return { remaining, nextIn };
 }
 
 function pad(n: number) {
@@ -13,24 +28,36 @@ function pad(n: number) {
 }
 
 export function CountdownTimer() {
-  const [target] = useState<number>(() => getMidnightTarget());
-  const [now, setNow] = useState<number>(() => Date.now());
+  const [state, setState] = useState<{
+    remaining: number;
+    nextIn: number;
+  } | null>(null);
+  const [flash, setFlash] = useState(false);
 
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
+    setState(getInitialState());
   }, []);
 
-  const remaining = Math.max(0, target - now);
-  const h = Math.floor(remaining / 3_600_000);
-  const m = Math.floor((remaining % 3_600_000) / 60_000);
-  const s = Math.floor((remaining % 60_000) / 1000);
+  useEffect(() => {
+    if (!state) return;
+    const id = setInterval(() => {
+      setState((prev) => {
+        if (!prev) return prev;
+        if (prev.nextIn <= 1) {
+          const remaining = prev.remaining > 3 ? prev.remaining - 1 : prev.remaining;
+          setFlash(true);
+          setTimeout(() => setFlash(false), 500);
+          return { remaining, nextIn: SECONDS_PER_SPOT };
+        }
+        return { ...prev, nextIn: prev.nextIn - 1 };
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [state]);
 
-  const blocks: { v: string; l: string }[] = [
-    { v: pad(h), l: "heures" },
-    { v: pad(m), l: "minutes" },
-    { v: pad(s), l: "secondes" },
-  ];
+  const remaining = state?.remaining ?? TOTAL_SPOTS;
+  const taken = TOTAL_SPOTS - remaining;
+  const nextIn = state?.nextIn ?? SECONDS_PER_SPOT;
 
   return (
     <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-6 text-white shadow-card sm:p-8">
@@ -48,31 +75,49 @@ export function CountdownTimer() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
           </span>
-          Offre dossier gratuit — expire dans
+          Places gratuites — décompte en direct
         </div>
 
-        <div className="mt-6 flex items-center justify-center gap-2 sm:gap-4">
-          {blocks.map((b, i) => (
-            <div key={b.l} className="flex items-center gap-2 sm:gap-4">
-              <div className="flex flex-col items-center">
-                <div className="grid h-20 min-w-[76px] place-items-center rounded-2xl bg-white/5 px-3 font-mono text-4xl font-extrabold tabular-nums backdrop-blur sm:h-24 sm:min-w-[96px] sm:text-6xl">
-                  {b.v}
-                </div>
-                <div className="mt-2 text-[10px] font-medium uppercase tracking-wider text-slate-400">
-                  {b.l}
-                </div>
-              </div>
-              {i < blocks.length - 1 && (
-                <span className="text-2xl font-bold text-slate-600 sm:text-4xl">
-                  :
-                </span>
-              )}
+        <div className="mt-6 flex items-end justify-center gap-3 sm:gap-5">
+          <div className="flex flex-col items-center">
+            <div
+              className={`grid h-24 min-w-[110px] place-items-center rounded-2xl bg-white/5 px-4 font-mono text-5xl font-extrabold tabular-nums backdrop-blur transition-all duration-300 sm:h-28 sm:min-w-[140px] sm:text-7xl ${
+                flash ? "scale-110 text-emerald-300" : "text-white"
+              }`}
+            >
+              {pad(remaining)}
             </div>
-          ))}
+            <div className="mt-2 text-[10px] font-medium uppercase tracking-wider text-slate-400">
+              restantes
+            </div>
+          </div>
+
+          <span className="pb-7 text-2xl font-bold text-slate-600 sm:text-4xl">
+            /
+          </span>
+
+          <div className="flex flex-col items-center">
+            <div className="grid h-24 min-w-[110px] place-items-center rounded-2xl bg-white/5 px-4 font-mono text-5xl font-extrabold tabular-nums text-slate-300 backdrop-blur sm:h-28 sm:min-w-[140px] sm:text-7xl">
+              {pad(TOTAL_SPOTS)}
+            </div>
+            <div className="mt-2 text-[10px] font-medium uppercase tracking-wider text-slate-400">
+              offertes
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-7 inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-2 ring-1 ring-white/10">
+          <span className="text-xs uppercase tracking-wider text-slate-400">
+            Prochaine place prise dans
+          </span>
+          <span className="font-mono text-lg font-extrabold tabular-nums text-white">
+            {pad(nextIn)}s
+          </span>
         </div>
 
         <div className="mt-5 text-xs text-slate-400">
-          Minuit · réinitialisation quotidienne
+          {taken} place{taken > 1 ? "s" : ""} déjà prise
+          {taken > 1 ? "s" : ""} aujourd'hui
         </div>
       </div>
     </div>

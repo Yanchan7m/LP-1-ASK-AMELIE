@@ -1,5 +1,4 @@
 import { CountdownTimer } from "./CountdownTimer";
-import { SpotsCounter } from "./SpotsCounter";
 
 export function ScarcityHero() {
   return (
@@ -31,10 +30,6 @@ export function ScarcityHero() {
 
         <div className="mx-auto mt-12 max-w-2xl">
           <CountdownTimer />
-        </div>
-
-        <div className="mx-auto mt-6 max-w-2xl">
-          <SpotsCounter />
         </div>
 
         <div className="mx-auto mt-10 max-w-2xl">

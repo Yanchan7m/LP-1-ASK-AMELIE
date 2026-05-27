@@ -66,7 +66,7 @@ export function LostSpots() {
   return (
     <section id="preuve" className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
-        <span className="text-xs font-semibold uppercase tracking-wider text-red-600">
+        <span className="text-xs font-semibold uppercase tracking-wider text-brand-600">
           Places parties — flux temps réel
         </span>
         <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
@@ -84,10 +84,10 @@ export function LostSpots() {
             <li
               key={s.id}
               className={`flex items-center gap-4 px-5 py-4 ${
-                idx === 0 ? "bg-red-50/60" : ""
+                idx === 0 ? "bg-brand-50/60" : ""
               }`}
             >
-              <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-red-500 to-amber-500 text-sm font-bold text-white">
+              <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-brand-600 to-emerald-500 text-sm font-bold text-white">
                 {s.initials}
               </div>
               <div className="flex-1 text-sm">
@@ -102,7 +102,7 @@ export function LostSpots() {
                 <div className="text-xs font-medium text-slate-500">
                   {s.time}
                 </div>
-                <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-700">
+                <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-700">
                   −1 place
                 </div>
               </div>
